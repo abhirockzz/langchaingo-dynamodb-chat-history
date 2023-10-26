@@ -4,6 +4,22 @@
 
 Here is a sample application you can use to try it. This will create a DynamoDB table - once that's done, you can start the conversation. Press ctrl+c to exit - the program will exit after deleting the table.
 
+- Please ensure the role used has access to Amazon Bedrock. Below is an example IAM permission policy:
+	```
+	{
+		"Version": "2012-10-17",
+		"Statement": [
+			{
+				"Effect": "Allow",
+				"Action": "bedrock:*",
+				"Resource": "*"
+			}
+		]
+	}
+	```
+
+- Please also ensure that you have access to the Claude base model. More info [here](https://docs.aws.amazon.com/bedrock/latest/userguide/model-access.html)
+
 Save the below to `main.go` and `go run main.go` to try. The example uses Claude implementation for [Amazon Bedrock](https://github.com/abhirockzz/amazon-bedrock-langchain-go/tree/master/llm/claude) but any other LLM supported by LangChain Go should work (e.g. OpenAI)
 
 ```go
@@ -40,11 +56,10 @@ const (
 	tableName = "test-table"
 	pkName    = "chat_id"
 	pkValue   = "42"
+	region    = "us-east-1"
 )
 
 func main() {
-
-	region := "us-east-1"
 
 	llm, err := claude.New(region, llm.DontUseHumanAssistantPrompt())
 
@@ -52,10 +67,12 @@ func main() {
 		log.Fatal(err)
 	}
 
-	err = createTable()
+	client := createClient()
 
-	if err != nil {
-		log.Fatal(err)
+	if err := checkTable(client); err != nil {
+		if errCreate := createTable(client); errCreate != nil {
+			log.Fatalf("Failed to create table: %v", errCreate)
+		}
 	}
 
 	exit := make(chan os.Signal, 1)
@@ -112,17 +129,25 @@ func main() {
 
 }
 
-func createTable() error {
-
-	region := "us-east-1"
+func createClient() *dynamodb.Client {
 
 	cfg, err := config.LoadDefaultConfig(context.Background(), config.WithRegion(region))
 	if err != nil {
-		return err
+		log.Fatalf("Failed to load configuration, %v", err)
 	}
-	client := dynamodb.NewFromConfig(cfg)
+	return dynamodb.NewFromConfig(cfg)
+}
 
-	_, err = client.CreateTable(context.Background(), &dynamodb.CreateTableInput{
+func checkTable(client *dynamodb.Client) error {
+	_, err := client.DescribeTable(context.Background(), &dynamodb.DescribeTableInput{
+		TableName: aws.String(tableName),
+	})
+	return err
+}
+
+func createTable(client *dynamodb.Client) error {
+
+	_, err := client.CreateTable(context.Background(), &dynamodb.CreateTableInput{
 		TableName: aws.String(tableName),
 		AttributeDefinitions: []types.AttributeDefinition{
 			{
