@@ -1,4 +1,4 @@
-module langchaingo-dynamodb-chat-history
+module github.com/abhirockzz/langchaingo-dynamodb-chat-history
 
 go 1.19
 
