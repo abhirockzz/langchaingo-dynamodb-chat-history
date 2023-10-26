@@ -14,7 +14,7 @@ import (
 type DynamoDBChatMessageHistory struct {
 	tableName       string
 	primaryKeyName  string
-	primaryKeyValue string
+	PrimaryKeyValue string
 	client          *dynamodb.Client
 }
 
