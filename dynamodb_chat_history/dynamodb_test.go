@@ -114,7 +114,7 @@ func queryByPrimaryKey(h *DynamoDBChatMessageHistory, expectedValue string, expe
 	getItemInput := &dynamodb.GetItemInput{
 		TableName: aws.String(h.tableName),
 		Key: map[string]types.AttributeValue{
-			h.primaryKeyName: &types.AttributeValueMemberS{Value: h.primaryKeyValue},
+			h.primaryKeyName: &types.AttributeValueMemberS{Value: h.PrimaryKeyValue},
 		},
 	}
 

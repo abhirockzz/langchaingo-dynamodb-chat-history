@@ -29,7 +29,7 @@ func New(region string, options ...ConfigOption) (*DynamoDBChatMessageHistory, e
 
 	ddbHistory.tableName = opts.TableName
 	ddbHistory.primaryKeyName = opts.PrimaryKeyName
-	ddbHistory.primaryKeyValue = opts.PrimaryKeyValue
+	ddbHistory.PrimaryKeyValue = opts.PrimaryKeyValue
 
 	if opts.DynamoDBClient == nil {
 
@@ -128,7 +128,7 @@ func (h *DynamoDBChatMessageHistory) addMessage(_ context.Context, text, message
 	}
 
 	primaryKey := map[string]types.AttributeValue{
-		h.primaryKeyName: &types.AttributeValueMemberS{Value: h.primaryKeyValue},
+		h.primaryKeyName: &types.AttributeValueMemberS{Value: h.PrimaryKeyValue},
 	}
 
 	updateItemInput := &dynamodb.UpdateItemInput{
@@ -152,7 +152,7 @@ func (h *DynamoDBChatMessageHistory) getMessages() ([]schema.ChatMessage, error)
 	getItemInput := &dynamodb.GetItemInput{
 		TableName: aws.String(h.tableName),
 		Key: map[string]types.AttributeValue{
-			h.primaryKeyName: &types.AttributeValueMemberS{Value: h.primaryKeyValue},
+			h.primaryKeyName: &types.AttributeValueMemberS{Value: h.PrimaryKeyValue},
 		},
 	}
 
