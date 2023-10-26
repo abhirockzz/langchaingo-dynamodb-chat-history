@@ -1,4 +1,4 @@
-module langchaingo
+module langchaingo-dynamodb-chat-history
 
 go 1.19
 
