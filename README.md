@@ -17,6 +17,21 @@ aws dynamodb create-table \
     --billing-mode PAY_PER_REQUEST
 ```
 
+The sample app below, uses Amazon Bedrock (see line - `llm, err := claude.New(region, llm.DontUseHumanAssistantPrompt())`). For this to work, you will need to make ensure proper IAM permissions. Refer to the ["Before You Begin" section](https://community.aws/concepts/amazon-bedrock-golang-getting-started#before-you-begin).
+
+```json
+{
+    "Version": "2012-10-17",
+    "Statement": [
+        {
+            "Effect": "Allow",
+            "Action": "bedrock:*",
+            "Resource": "*"
+        }
+    ]
+}
+```
+
 Save the program to a file named `main.go`. 
 
 Then, create a new Go module, run the program and start chatting.
